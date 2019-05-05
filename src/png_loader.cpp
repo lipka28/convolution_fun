@@ -178,10 +178,10 @@ void Png_loader::merge_colors()
             
         for(int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
-                row_pointers[y][x*4] = (png_byte)r_pixels[y*height+x];
-                row_pointers[y][x*4+1] = (png_byte)r_pixels[y*height+x];
-                row_pointers[y][x*4+2] = (png_byte)r_pixels[y*height+x];
-                row_pointers[y][x*4+3] = (png_byte)r_pixels[y*height+x];
+                row_pointers[y][x*4] = r_pixels[y*height+x];
+                row_pointers[y][x*4+1] = g_pixels[y*height+x];
+                row_pointers[y][x*4+2] = b_pixels[y*height+x];
+                row_pointers[y][x*4+3] = a_pixels[y*height+x];
             }
         }
 
