@@ -60,15 +60,17 @@ error Png_loader::read_png_file(const char *file_name)
     }
 
     png_read_image(png, row_pointers);
+    separate_colors();
 
     fclose(input_image);
 
     return SUCCES;
 }
 
-error Png_loader::save_to_file(const char *output_file)
+error Png_loader::save_to_file(const char *output_file, bool use_separeted_rgba_layers)
 {
     if(!row_pointers)return FAIL;
+    if(use_separeted_rgba_layers) merge_colors(); // will merge color layers if available
 
     FILE *output = fopen(output_file, "wb");
     if(!output) return FAIL;
@@ -108,6 +110,10 @@ void Png_loader::clear_data()
         }
         delete[] row_pointers;
     }
+    if (r_pixels) delete[] r_pixels;
+    if (g_pixels) delete[] g_pixels;
+    if (b_pixels) delete[] b_pixels;
+    if (a_pixels) delete[] a_pixels;
 }
 
 int Png_loader::get_height() const
@@ -135,7 +141,61 @@ pixel* Png_loader::get_row_major_RGBA_pixel_data()
     return pixel_data;
 }
 
+void Png_loader::separate_colors()
+{
+    if(row_pointers){
+
+        if(r_pixels && g_pixels &&
+            b_pixels && a_pixels){
+            delete[] r_pixels;
+            delete[] g_pixels;
+            delete[] b_pixels;
+            delete[] a_pixels;
+
+        }
+
+        r_pixels = new pixel[height*width]();
+        g_pixels = new pixel[height*width]();
+        b_pixels = new pixel[height*width]();
+        a_pixels = new pixel[height*width]();
+        
+        for (int y = 0; y < height; y++){
+            for (int x = 0; x < width; x++){
+                r_pixels[y*height+x] = row_pointers[y][x*4];
+                g_pixels[y*height+x] = row_pointers[y][x*4+1];
+                b_pixels[y*height+x] = row_pointers[y][x*4+2];
+                a_pixels[y*height+x] = row_pointers[y][x*4+3];
+            }
+        }
+    }
+
+}
+
+void Png_loader::merge_colors()
+{
+    if(r_pixels && g_pixels &&
+        b_pixels && a_pixels && row_pointers){
+            
+        for(int y = 0; y < height; y++){
+            for(int x = 0; x < width; x++){
+                row_pointers[y][x*4] = (png_byte)r_pixels[y*height+x];
+                row_pointers[y][x*4+1] = (png_byte)r_pixels[y*height+x];
+                row_pointers[y][x*4+2] = (png_byte)r_pixels[y*height+x];
+                row_pointers[y][x*4+3] = (png_byte)r_pixels[y*height+x];
+            }
+        }
+
+    }
+}
+
 Png_loader::~Png_loader()
 {
     clear_data();
+}
+
+void Png_loader::DEBUG_destroy_blue()
+{
+    for(int x = 0; x < width*height; x++){
+        b_pixels[x] = (pixel)0;
+    }
 }
