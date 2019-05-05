@@ -69,8 +69,8 @@ error Png_loader::read_png_file(const char *file_name)
 
 error Png_loader::save_to_file(const char *output_file, bool use_separeted_rgba_layers)
 {
-    if(!row_pointers)return FAIL;
     if(use_separeted_rgba_layers) merge_colors(); // will merge color layers if available
+    if(!row_pointers)return FAIL;
 
     FILE *output = fopen(output_file, "wb");
     if(!output) return FAIL;
@@ -173,6 +173,13 @@ void Png_loader::separate_colors()
 
 void Png_loader::merge_colors()
 {
+    if(!row_pointers){
+        row_pointers = new png_bytep[height]();
+        for (int y = 0; y < height; y++){
+            row_pointers[y] = new png_byte[width*4]();
+        }
+    }
+
     if(r_pixels && g_pixels &&
         b_pixels && a_pixels && row_pointers){
             
@@ -188,14 +195,114 @@ void Png_loader::merge_colors()
     }
 }
 
+pixel* Png_loader::get_row_major_R_pixel_data()
+{
+    pixel *pixel_data = new pixel[width*height]();
+    for(int y = 0; y < width*height; y++){
+        pixel_data[y] = r_pixels[y];
+    }
+    return pixel_data;
+}
+
+pixel* Png_loader::get_row_major_G_pixel_data()
+{
+    pixel *pixel_data = new pixel[width*height]();
+    for(int y = 0; y < width*height; y++){
+        pixel_data[y] = g_pixels[y];
+    }
+    return pixel_data;
+}
+
+pixel* Png_loader::get_row_major_B_pixel_data()
+{
+    pixel *pixel_data = new pixel[width*height]();
+    for(int y = 0; y < width*height; y++){
+        pixel_data[y] = b_pixels[y];
+    }
+    return pixel_data;
+}
+
+pixel* Png_loader::get_row_major_A_pixel_data()
+{
+    pixel *pixel_data = new pixel[width*height]();
+    for(int y = 0; y < width*height; y++){
+        pixel_data[y] = r_pixels[y];
+    }
+    return pixel_data;
+}
+
+error Png_loader::set_row_major_RGBA_pixel_data(pixel *RGBA_pixels)
+{
+    clear_data();
+
+    row_pointers = new png_bytep[height]();
+    for (int y = 0; y < height; y++){
+        row_pointers[y] = new png_byte[width*4]();
+    }
+
+    for (int y = 0; y < height; y++){
+        for (int x = 0; x < width; x++){
+            row_pointers[y][x] = pixel_data[height*y+x];
+        }
+    }
+
+    separate_colors();
+    
+    return SUCCES;
+}
+
+error Png_loader::set_row_major_R_pixel_data(pixel *R_pixels)
+{
+    if(r_pixels) delete[] r_pixels;
+    r_pixels = new pixel[height*width]();
+    for(int y = 0; y < height*width; y++){
+        r_pixels[y] = R_pixels[y];
+    }
+    
+    return SUCCES;
+}
+
+error Png_loader::set_row_major_G_pixel_data(pixel *G_pixels)
+{
+    if(g_pixels) delete[] g_pixels;
+    g_pixels = new pixel[height*width]();
+    for(int y = 0; y < height*width; y++){
+        g_pixels[y] = G_pixels[y];
+    }
+    return SUCCES;
+}
+
+error Png_loader::set_row_major_B_pixel_data(pixel *B_pixels)
+{
+    if(b_pixels) delete[] b_pixels;
+    b_pixels = new pixel[height*width]();
+    for(int y = 0; y < height*width; y++){
+        b_pixels[y] = B_pixels[y];
+    }
+    return SUCCES;
+}
+
+error Png_loader::set_row_major_A_pixel_data(pixel *A_pixels)
+{
+    if(a_pixels) delete[] a_pixels;
+    a_pixels = new pixel[height*width]();
+    for(int y = 0; y < height*width; y++){
+        a_pixels[y] = A_pixels[y];
+    }
+    return SUCCES;
+}
+
+error Png_loader::set_image_size(int width, int height)
+{
+    if(width <= 0 || height <= 0) return FAIL;
+
+    this->width = width;
+    this->height = height;
+
+    return SUCCES;
+}
+
 Png_loader::~Png_loader()
 {
     clear_data();
-}
-
-void Png_loader::DEBUG_destroy_blue()
-{
-    for(int x = 0; x < width*height; x++){
-        b_pixels[x] = (pixel)0;
-    }
 }

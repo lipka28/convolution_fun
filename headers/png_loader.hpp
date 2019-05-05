@@ -31,9 +31,20 @@ public:
     ~Png_loader();
     error read_png_file(const char *file_name);
     error save_to_file(const char *output_file, bool use_separeted_rgba_layers = false);
+    
     pixel* get_row_major_RGBA_pixel_data();
+    pixel* get_row_major_R_pixel_data();
+    pixel* get_row_major_G_pixel_data();
+    pixel* get_row_major_B_pixel_data();
+    pixel* get_row_major_A_pixel_data();
+
+    error set_row_major_RGBA_pixel_data(pixel *RGBA_pixels);
+    error set_row_major_R_pixel_data(pixel *R_pixels);
+    error set_row_major_G_pixel_data(pixel *G_pixels);
+    error set_row_major_B_pixel_data(pixel *B_pixels);
+    error set_row_major_A_pixel_data(pixel *A_pixels);
+    
     int get_width() const;
     int get_height() const;
-
-    void DEBUG_destroy_blue();
+    error set_image_size(int width, int height);
 };
