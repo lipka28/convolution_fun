@@ -117,12 +117,12 @@ void Png_loader::clear_data()
     if (a_pixels) {delete[] a_pixels; a_pixels = nullptr;}
 }
 
-int Png_loader::get_height()
+const int Png_loader::get_height()
 {
     return height;
 }
 
-int Png_loader::get_width()
+const int Png_loader::get_width()
 {
     return width;
 }
