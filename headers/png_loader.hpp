@@ -44,7 +44,7 @@ public:
     error set_row_major_B_pixel_data(pixel *B_pixels);
     error set_row_major_A_pixel_data(pixel *A_pixels);
     
-    int get_width() const;
-    int get_height() const;
+    const int get_width();
+    const int get_height();
     error set_image_size(int width, int height);
 };
