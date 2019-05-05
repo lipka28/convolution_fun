@@ -109,11 +109,12 @@ void Png_loader::clear_data()
             delete[] row_pointers[y];
         }
         delete[] row_pointers;
+        row_pointers = nullptr;
     }
-    if (r_pixels) delete[] r_pixels;
-    if (g_pixels) delete[] g_pixels;
-    if (b_pixels) delete[] b_pixels;
-    if (a_pixels) delete[] a_pixels;
+    if (r_pixels) {delete[] r_pixels; r_pixels = nullptr;}
+    if (g_pixels) {delete[] g_pixels; g_pixels = nullptr;}
+    if (b_pixels) {delete[] b_pixels; b_pixels = nullptr;}
+    if (a_pixels) {delete[] a_pixels; a_pixels = nullptr;}
 }
 
 int Png_loader::get_height() const
