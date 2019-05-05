@@ -174,15 +174,15 @@ void Png_loader::separate_colors()
 
 void Png_loader::merge_colors()
 {
-    if(!row_pointers){
-        row_pointers = new png_bytep[height]();
-        for (int y = 0; y < height; y++){
-            row_pointers[y] = new png_byte[width*4]();
-        }
-    }
-
     if(r_pixels && g_pixels &&
         b_pixels && a_pixels && row_pointers){
+
+        if(!row_pointers){
+        row_pointers = new png_bytep[height]();
+            for (int y = 0; y < height; y++){
+                row_pointers[y] = new png_byte[width*4]();
+            }
+        }
             
         for(int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
