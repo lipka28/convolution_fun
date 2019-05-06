@@ -227,7 +227,7 @@ pixel* Png_loader::get_row_major_A_pixel_data()
 {
     pixel *pixel_data = new pixel[width*height]();
     for(int y = 0; y < width*height; y++){
-        pixel_data[y] = r_pixels[y];
+        pixel_data[y] = a_pixels[y];
     }
     return pixel_data;
 }
