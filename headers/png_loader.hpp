@@ -1,12 +1,7 @@
 #pragma once
 #include <png.h>
 
-using pixel = unsigned short;
-
-enum error {
-    SUCCES = 0,
-    FAIL
-};
+#include "globals.hpp"
 
 class Png_loader
 {
