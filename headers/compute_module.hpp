@@ -17,4 +17,6 @@ public:
     error setup_compute_module(int height, int width, 
                                pixel *r_data, pixel *g_data,
                                pixel *b_data, pixel *a_data);
+    vector<pixel*> get_RGBA_vect_data();
+    error slow_cpu_edge_detection();
 };
