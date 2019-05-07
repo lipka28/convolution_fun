@@ -10,6 +10,7 @@ class Compute_module
 private:
     int width = 0, height = 0;
     vector<pixel*> pixel_data;
+    vector<pixel*> output_image;
 
 public:
     Compute_module();
