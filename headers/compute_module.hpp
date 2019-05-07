@@ -12,6 +12,7 @@ private:
     vector<pixel*> pixel_data;
     vector<pixel*> output_image;
 
+
 public:
     Compute_module();
     ~Compute_module();

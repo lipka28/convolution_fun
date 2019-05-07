@@ -87,9 +87,9 @@ error Compute_module::slow_cpu_edge_detection()
     for(int i = 0; i < height*width; i++){
         if(i < width || i >= height*width-width)continue;
         if( (i-1)%width == 0 || (i+1)%width == 0 )continue;
-
-        for(int layer = 0; layer < 2; layer++){
-            pixel acum = ed_ker[0] * pixel_data[layer][i+1+width]
+        int big = 0;
+        for(int layer = 0; layer < 3; layer++){
+            pixel acum = (pixel)ed_ker[0] * pixel_data[layer][i+1+width]
                         +ed_ker[1] * pixel_data[layer][i+width]
                         +ed_ker[2] * pixel_data[layer][i-1+width]
                         +ed_ker[3] * pixel_data[layer][i+1]
@@ -98,9 +98,14 @@ error Compute_module::slow_cpu_edge_detection()
                         +ed_ker[6] * pixel_data[layer][i+1-width]
                         +ed_ker[7] * pixel_data[layer][i-width]
                         +ed_ker[8] * pixel_data[layer][i-1-width];
-            
-            output_image[layer][i] = acum;
+            if(acum > 255) acum = 0;
+            if(acum > big) big = acum;
+            //if(layer > 0 && output_image[layer-1][i] != acum) acum = output_image[layer-1][i]; 
+            //output_image[layer][i] = acum;
         }
+
+        output_image[0][i] = output_image[1][i] = output_image[2][i] = big;
+
     }
 
     return SUCCES;
