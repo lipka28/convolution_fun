@@ -25,12 +25,13 @@ int main(int argc, char **argv){
                                        image->get_row_major_A_pixel_data())) 
     cout << "failed to setup compute module" << endl;
 
-  if(comp_module->slow_cpu_edge_detection())cout << "faild to run task" << endl;
+  if(comp_module->slow_cpu_edge_detection())cout << "failed to run task" << endl;
   
-  image->set_row_major_R_pixel_data(comp_module->get_RGBA_vect_data()[0]);
-  image->set_row_major_G_pixel_data(comp_module->get_RGBA_vect_data()[1]);
-  image->set_row_major_B_pixel_data(comp_module->get_RGBA_vect_data()[2]);
-  image->set_row_major_A_pixel_data(comp_module->get_RGBA_vect_data()[3]);
+  vector<pixel*> data = comp_module->get_RGBA_vect_data();
+  image->set_row_major_R_pixel_data(data[0]);
+  image->set_row_major_G_pixel_data(data[1]);
+  image->set_row_major_B_pixel_data(data[2]);
+  image->set_row_major_A_pixel_data(data[3]);
 
   if(image->save_to_file(argv[2],true)) cout << "failed to write " << argv[2] << endl;
   cout << "done!" << endl;
