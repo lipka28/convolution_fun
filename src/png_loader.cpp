@@ -98,7 +98,7 @@ error Png_loader::save_to_file(Png_image const &img_data, const char *output_fil
 
     png_bytep *row_pointers = new png_bytep[img_data.height]();
     for (size_t y = 0; y < img_data.height; y++){
-        row_pointers[y] = new png_byte[img_data.height*img_data.width*4]();
+        row_pointers[y] = new png_byte[img_data.width*4]();
     }
 
     merge_colors(row_pointers, img_data);

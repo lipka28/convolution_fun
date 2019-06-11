@@ -8,8 +8,8 @@ using std::vector;
 
 struct Png_image
 {
-    int width;
-    int height;
+    size_t width;
+    size_t height;
     png_byte color_type;
     png_byte bit_depth;
 
