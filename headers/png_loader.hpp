@@ -1,45 +1,37 @@
 #pragma once
 #include <png.h>
+#include <vector>
 
 #include "globals.hpp"
+
+using std::vector;
+
+struct Png_image
+{
+    int width;
+    int height;
+    png_byte color_type;
+    png_byte bit_depth;
+
+    vector<pixel> r_pixels;
+    vector<pixel> g_pixels;
+    vector<pixel> b_pixels;
+    vector<pixel> a_pixels;
+};
 
 class Png_loader
 {
 private:
-    int width = 0, height = 0;
-    png_byte color_type = 0;
-    png_byte bit_depth = 0;
-    png_bytep *row_pointers = nullptr;
-    pixel *pixel_data = nullptr;
-    pixel *r_pixels = nullptr;
-    pixel *g_pixels = nullptr;
-    pixel *b_pixels = nullptr;
-    pixel *a_pixels = nullptr;
-
-    void clear_data();
-    void separate_colors();
-    void merge_colors();
+    /**
+     * Fills Png_image stuct with seperated RGBA pixel data
+     */
+    static void separate_colors(Png_image &image_data, png_bytepp const &row_data);
+    static void merge_colors(png_bytepp &row_data, Png_image const &image_data);
     
 public:
-    Png_loader(const char *file_name, error &fail_status);
-    Png_loader();
-    ~Png_loader();
-    error read_png_file(const char *file_name);
-    error save_to_file(const char *output_file, bool use_separeted_rgba_layers = false);
-    
-    pixel* get_row_major_RGBA_pixel_data();
-    pixel* get_row_major_R_pixel_data();
-    pixel* get_row_major_G_pixel_data();
-    pixel* get_row_major_B_pixel_data();
-    pixel* get_row_major_A_pixel_data();
+    //Png_loader();
+    //~Png_loader();
+    static Png_image get_png_image_data(const char *file_name);
+    static error save_to_file(Png_image const &img_data, const char *output_file);
 
-    error set_row_major_RGBA_pixel_data(pixel *RGBA_pixels);
-    error set_row_major_R_pixel_data(pixel *R_pixels);
-    error set_row_major_G_pixel_data(pixel *G_pixels);
-    error set_row_major_B_pixel_data(pixel *B_pixels);
-    error set_row_major_A_pixel_data(pixel *A_pixels);
-    
-    const int get_width();
-    const int get_height();
-    error set_image_size(int width, int height);
 };
