@@ -2,7 +2,7 @@
 #include <memory>
 
 #include "../headers/png_loader.hpp"
-#include "../headers/compute_module.hpp"
+//#include "../headers/compute_module.hpp"
 
 using namespace std;
 
