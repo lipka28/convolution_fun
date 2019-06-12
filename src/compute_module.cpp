@@ -98,7 +98,7 @@ error Compute_module::slow_cpu_edge_detection()
 
 }
 
-sp_Image Compute_module::get_processed_image()
+sp_Image Compute_module::get_processed_image() const
 {
     return processed_image;
 }

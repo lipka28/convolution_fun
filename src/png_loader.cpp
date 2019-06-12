@@ -2,7 +2,6 @@
 
 sp_Image Png_loader::get_png_image_data(const char *file_name)
 {
-    //clear_data();
     sp_Image image_data = make_shared<Png_image>();
     image_data->height = image_data->width = 0;
 
