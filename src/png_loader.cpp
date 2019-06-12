@@ -170,10 +170,12 @@ void Png_loader::separate_colors(sp_Image &image_data, png_bytepp const &row_dat
 
     for (size_t y = 0; y < height; y++){
         for (size_t x = 0; x < width; x++){
-            image_data->r_pixels[y*width+x] = row_data[y][x*4];
-            image_data->g_pixels[y*width+x] = row_data[y][x*4+1];
-            image_data->b_pixels[y*width+x] = row_data[y][x*4+2];
-            image_data->a_pixels[y*width+x] = row_data[y][x*4+3];
+            size_t y_width_x = y*width+x;
+            size_t x_4 = x*4;
+            image_data->r_pixels[y_width_x] = row_data[y][x_4];
+            image_data->g_pixels[y_width_x] = row_data[y][x_4+1];
+            image_data->b_pixels[y_width_x] = row_data[y][x_4+2];
+            image_data->a_pixels[y_width_x] = row_data[y][x_4+3];
         }
     }
 
@@ -186,10 +188,12 @@ void Png_loader::merge_colors(png_bytepp &row_data, sp_Image const &image_data)
     
     for(size_t y = 0; y < height; y++){
         for(size_t x = 0; x < width; x++){
-            row_data[y][x*4] = image_data->r_pixels[y*width+x];
-            row_data[y][x*4+1] = image_data->g_pixels[y*width+x];
-            row_data[y][x*4+2] = image_data->b_pixels[y*width+x];
-            row_data[y][x*4+3] = image_data->a_pixels[y*width+x];
+            size_t y_width_x = y*width+x;
+            size_t x_4 = x*4;
+            row_data[y][x_4] = image_data->r_pixels[y_width_x];
+            row_data[y][x_4+1] = image_data->g_pixels[y_width_x];
+            row_data[y][x_4+2] = image_data->b_pixels[y_width_x];
+            row_data[y][x_4+3] = image_data->a_pixels[y_width_x];
         }
     }
 

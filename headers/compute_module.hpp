@@ -15,6 +15,6 @@ private:
 public:
     Compute_module(sp_Image const &source_image);
     ~Compute_module();
-    sp_Image get_processed_image();
+    sp_Image get_processed_image() const;
     error slow_cpu_edge_detection();
 };

@@ -20,12 +20,11 @@ int main(int argc, char **argv){
     cout << "Something broke on image load" << endl;
     return 2;
   }
+  
   cout << "finished loading image" << endl;
-
   cout << "creating compute modue from image" << endl;
   auto comp_module = make_unique<Compute_module>(png_image);
   cout << "finished creating compute modue from image" << endl;
-
   cout << "started cpu compute" << endl;
   comp_module->slow_cpu_edge_detection();
   png_image = comp_module->get_processed_image();
@@ -37,6 +36,7 @@ int main(int argc, char **argv){
     cout << "something broke on image save" << endl;
     return 3;
   }
+
   cout << "finished saving image" << endl;
   cout << "Done!!! Everything OK" << endl;
 
