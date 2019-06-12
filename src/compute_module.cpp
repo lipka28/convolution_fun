@@ -4,7 +4,7 @@
 Compute_module::Compute_module(sp_Image const &source_image)
 {
     original_image = source_image;
-    processed_image = source_image;
+    processed_image = make_shared<Png_image>(*source_image);
 
 }
 
