@@ -1,9 +1,10 @@
 #include "../headers/png_loader.hpp"
 
-Png_image Png_loader::get_png_image_data(const char *file_name)
+sp_Image Png_loader::get_png_image_data(const char *file_name)
 {
     //clear_data();
-    Png_image image_data = {0, 0, 0, 0};
+    sp_Image image_data = make_shared<Png_image>();
+    image_data->height = image_data->width = 0;
 
     FILE *input_image = fopen(file_name, "rb");
     
@@ -33,20 +34,20 @@ Png_image Png_loader::get_png_image_data(const char *file_name)
     png_init_io(png, input_image);
     png_read_info(png, info);
 
-    image_data.width       = png_get_image_width(png, info);
-    image_data.height      = png_get_image_height(png, info);
-    image_data.color_type  = png_get_color_type(png, info);
-    image_data.bit_depth   = png_get_bit_depth(png, info);
+    image_data->width       = png_get_image_width(png, info);
+    image_data->height      = png_get_image_height(png, info);
+    image_data->color_type  = png_get_color_type(png, info);
+    image_data->bit_depth   = png_get_bit_depth(png, info);
 
-    if(image_data.bit_depth == 16) {
+    if(image_data->bit_depth == 16) {
         png_set_strip_16(png);
     }
 
-    if(image_data.color_type == PNG_COLOR_TYPE_PALETTE) {
+    if(image_data->color_type == PNG_COLOR_TYPE_PALETTE) {
         png_set_palette_to_rgb(png);
     }
 
-    if(image_data.color_type == PNG_COLOR_TYPE_GRAY && image_data.bit_depth < 8) {
+    if(image_data->color_type == PNG_COLOR_TYPE_GRAY && image_data->bit_depth < 8) {
         png_set_expand_gray_1_2_4_to_8(png);
     }
 
@@ -54,23 +55,23 @@ Png_image Png_loader::get_png_image_data(const char *file_name)
         png_set_tRNS_to_alpha(png);
     }
 
-    if(image_data.color_type == PNG_COLOR_TYPE_RGB 
-        || image_data.color_type == PNG_COLOR_TYPE_GRAY 
-        || image_data.color_type == PNG_COLOR_TYPE_PALETTE) {
+    if(image_data->color_type == PNG_COLOR_TYPE_RGB 
+        || image_data->color_type == PNG_COLOR_TYPE_GRAY 
+        || image_data->color_type == PNG_COLOR_TYPE_PALETTE) {
 
         png_set_filler(png, 0xFF, PNG_FILLER_AFTER);
     }
 
-    if(image_data.color_type == PNG_COLOR_TYPE_GRAY 
-        || image_data.color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
+    if(image_data->color_type == PNG_COLOR_TYPE_GRAY 
+        || image_data->color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
         
         png_set_gray_to_rgb(png);
     }
 
     png_read_update_info(png, info);
 
-    png_bytep *row_pointers = new png_bytep[image_data.height]();
-    for (size_t y = 0; y < image_data.height; y++){
+    png_bytep *row_pointers = new png_bytep[image_data->height]();
+    for (size_t y = 0; y < image_data->height; y++){
         row_pointers[y] = new png_byte[png_get_rowbytes(png, info)]();
     }
 
@@ -78,7 +79,7 @@ Png_image Png_loader::get_png_image_data(const char *file_name)
     separate_colors(image_data, row_pointers);
 
     if(row_pointers){
-        for (size_t y = 0; y < image_data.height; y++){
+        for (size_t y = 0; y < image_data->height; y++){
             delete[] row_pointers[y];
         }
         delete[] row_pointers;
@@ -89,16 +90,16 @@ Png_image Png_loader::get_png_image_data(const char *file_name)
     return image_data;
 }
 
-error Png_loader::save_to_file(Png_image const &img_data, const char *output_file)
+error Png_loader::save_to_file(sp_Image const &img_data, const char *output_file)
 {
-    if(img_data.height == 0 || img_data.width == 0)
+    if(img_data->height == 0 || img_data->width == 0)
     {
         return FAIL;
     }
 
-    png_bytep *row_pointers = new png_bytep[img_data.height]();
-    for (size_t y = 0; y < img_data.height; y++){
-        row_pointers[y] = new png_byte[img_data.width*4]();
+    png_bytep *row_pointers = new png_bytep[img_data->height]();
+    for (size_t y = 0; y < img_data->height; y++){
+        row_pointers[y] = new png_byte[img_data->width*4]();
     }
 
     merge_colors(row_pointers, img_data);
@@ -131,8 +132,8 @@ error Png_loader::save_to_file(Png_image const &img_data, const char *output_fil
     png_set_IHDR(
         png,
         info,
-        img_data.width,
-        img_data.height,
+        img_data->width,
+        img_data->height,
         8,
         PNG_COLOR_TYPE_RGBA,
         PNG_INTERLACE_NONE,
@@ -147,7 +148,7 @@ error Png_loader::save_to_file(Png_image const &img_data, const char *output_fil
     fclose(output);
 
     if(row_pointers){
-        for (size_t y = 0; y < img_data.height; y++){
+        for (size_t y = 0; y < img_data->height; y++){
             delete[] row_pointers[y];
         }
         delete[] row_pointers;
@@ -156,38 +157,39 @@ error Png_loader::save_to_file(Png_image const &img_data, const char *output_fil
     return SUCCES;
 }
 
-void Png_loader::separate_colors(Png_image &image_data, png_bytepp const &row_data)
+void Png_loader::separate_colors(sp_Image &image_data, png_bytepp const &row_data)
 {
-    const size_t width = image_data.width;
-    const size_t height = image_data.height;
+    const size_t width = image_data->width;
+    const size_t height = image_data->height;
+    const size_t size = width*height;
 
-    image_data.r_pixels.reserve(width*height);
-    image_data.g_pixels.reserve(width*height);
-    image_data.b_pixels.reserve(width*height);
-    image_data.a_pixels.reserve(width*height);
+    image_data->r_pixels.resize(size);
+    image_data->g_pixels.resize(size);
+    image_data->b_pixels.resize(size);
+    image_data->a_pixels.resize(size);
 
     for (size_t y = 0; y < height; y++){
         for (size_t x = 0; x < width; x++){
-            image_data.r_pixels[y*width+x] = row_data[y][x*4];
-            image_data.g_pixels[y*width+x] = row_data[y][x*4+1];
-            image_data.b_pixels[y*width+x] = row_data[y][x*4+2];
-            image_data.a_pixels[y*width+x] = row_data[y][x*4+3];
+            image_data->r_pixels[y*width+x] = row_data[y][x*4];
+            image_data->g_pixels[y*width+x] = row_data[y][x*4+1];
+            image_data->b_pixels[y*width+x] = row_data[y][x*4+2];
+            image_data->a_pixels[y*width+x] = row_data[y][x*4+3];
         }
     }
 
 }
 
-void Png_loader::merge_colors(png_bytepp &row_data, Png_image const &image_data)
+void Png_loader::merge_colors(png_bytepp &row_data, sp_Image const &image_data)
 {
-    const size_t width = image_data.width;
-    const size_t height = image_data.height;
+    const size_t width = image_data->width;
+    const size_t height = image_data->height;
     
     for(size_t y = 0; y < height; y++){
         for(size_t x = 0; x < width; x++){
-            row_data[y][x*4] = image_data.r_pixels[y*width+x];
-            row_data[y][x*4+1] = image_data.g_pixels[y*width+x];
-            row_data[y][x*4+2] = image_data.b_pixels[y*width+x];
-            row_data[y][x*4+3] = image_data.a_pixels[y*width+x];
+            row_data[y][x*4] = image_data->r_pixels[y*width+x];
+            row_data[y][x*4+1] = image_data->g_pixels[y*width+x];
+            row_data[y][x*4+2] = image_data->b_pixels[y*width+x];
+            row_data[y][x*4+3] = image_data->a_pixels[y*width+x];
         }
     }
 
