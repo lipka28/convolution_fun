@@ -19,3 +19,4 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
 target_link_libraries(convolution ${PNG_LIBRARY})
+TARGET_LINK_LIBRARIES(convolution pthread)

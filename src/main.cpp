@@ -26,7 +26,7 @@ int main(int argc, char **argv){
   auto comp_module = make_unique<Compute_module>(png_image);
   cout << "finished creating compute modue from image" << endl;
   cout << "started cpu compute" << endl;
-  comp_module->slow_cpu_edge_detection();
+  comp_module->fast_cpu_edge_detection(0);
   png_image = comp_module->get_processed_image();
   cout << "finished cpu compute" << endl;
   cout << "starting saving image" << endl;
