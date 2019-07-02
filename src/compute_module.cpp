@@ -16,7 +16,7 @@ Compute_module::~Compute_module()
 error Compute_module::slow_cpu_edge_detection()
 {
     size_t size = original_image->width * original_image->height;
-    cpu_edge_detection_workload(ref(original_image), ref(processed_image), 0, size, 0);
+    cpu_edge_detection_workload(original_image, processed_image, 0, original_image->width, 0);
 
     return SUCCES;
 
@@ -33,15 +33,14 @@ error Compute_module::fast_cpu_edge_detection(int num_of_threads)
 
     vector<thread> threads(num_of_threads);
     size_t width = original_image->width;
-    size_t start_index = 0;
-    size_t end_index = start_index + width;
     size_t stride = width * (num_of_threads-1);
 
-    for (auto &t : threads)
+    for (size_t i = 0; i < num_of_threads; i++)
     {
-        t = thread(cpu_edge_detection_workload,ref(original_image), ref(processed_image),
-                                            width, width + width, stride);
+        threads[i] = thread(cpu_edge_detection_workload,ref(original_image), ref(processed_image),
+                   i*width, i*width + width, stride);
     }
+
 
 
     for (auto &t : threads)
@@ -71,10 +70,23 @@ void Compute_module::cpu_edge_detection_workload(sp_Image const &original_image,
 
     for(size_t i = start_index; i < end_index; i++){
         if(i < width || i >= size-width){
+            
+            if (i == end_index - 1 && (start_index + stride) < size)
+            {
+            start_index = end_index + stride;
+            end_index += end_index + stride;
+            i = start_index;
+            }
             continue;
         }
 
         if( (i-1)%width == 0 || (i+1)%width == 0 ){
+            if (i == end_index-1 && (start_index + stride) < size)
+            {
+            start_index = end_index + stride;
+            end_index += end_index + stride;
+            i = start_index;
+            }
             continue;
         }
 
@@ -135,12 +147,6 @@ void Compute_module::cpu_edge_detection_workload(sp_Image const &original_image,
 
         processed_image->r_pixels[i] = processed_image->g_pixels[i] = processed_image->b_pixels[i] = big; 
 
-        if (i == end_index-1 && (start_index + stride) < size && stride != 0)
-        {
-            start_index += stride;
-            end_index += stride;
-            i = start_index;
-        }
     }
 
 }
