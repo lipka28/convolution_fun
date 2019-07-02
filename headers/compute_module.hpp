@@ -18,6 +18,9 @@ private:
                                             size_t end_index,
                                             const size_t stride);
 
+    static void apply_stride(size_t &start_index, size_t &end_index,
+                            size_t &i, size_t const &width, size_t const &stride);
+
 
 public:
     Compute_module(sp_Image const &source_image);

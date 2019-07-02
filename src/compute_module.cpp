@@ -15,11 +15,8 @@ Compute_module::~Compute_module()
 
 error Compute_module::slow_cpu_edge_detection()
 {
-    size_t size = original_image->width * original_image->height;
-    cpu_edge_detection_workload(original_image, processed_image, 0, original_image->width, 0);
-
+    fast_cpu_edge_detection(1);
     return SUCCES;
-
 }
 
 error Compute_module::fast_cpu_edge_detection(int num_of_threads)
@@ -55,6 +52,15 @@ sp_Image Compute_module::get_processed_image() const
     return processed_image;
 }
 
+
+void Compute_module::apply_stride(size_t &start_index, size_t &end_index,
+                  size_t &i, size_t const &width, size_t const &stride)
+{
+    start_index = end_index + stride;
+    end_index = start_index + width;
+    i = start_index;
+}
+
 void Compute_module::cpu_edge_detection_workload(sp_Image const &original_image,
                                                 sp_Image &processed_image,
                                                 size_t start_index,
@@ -72,9 +78,7 @@ void Compute_module::cpu_edge_detection_workload(sp_Image const &original_image,
             
             if (i == end_index - 1 && (start_index + stride) < size)
             {
-            start_index = end_index + stride;
-            end_index = start_index + width;
-            i = start_index;
+                apply_stride(start_index, end_index, i, width, stride);
             }
             continue;
         }
@@ -82,9 +86,7 @@ void Compute_module::cpu_edge_detection_workload(sp_Image const &original_image,
         if( (i-1)%width == 0 || (i+1)%width == 0 ){
             if (i == end_index-1 && (start_index + stride) < size)
             {
-            start_index = end_index + stride;
-            end_index = start_index + width;
-            i = start_index;
+                apply_stride(start_index, end_index, i, width, stride);
             }
             continue;
         }

@@ -1,7 +1,5 @@
 #include "../headers/png_loader.hpp"
 
-#include <iostream> // for debug only
-
 sp_Image Png_loader::get_png_image_data(const char *file_name)
 {
     sp_Image image_data = make_shared<Png_image>();
@@ -11,27 +9,23 @@ sp_Image Png_loader::get_png_image_data(const char *file_name)
     
     if(!input_image) {
         return image_data;
-        std::cout << "Failed to open PNG file" << std::endl;
     }
 
     png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, 
                                 nullptr, nullptr, nullptr);
     
     if(!png) {
-        std::cout << "Failed to obttain information from PNG file" << std::endl;
         fclose(input_image); 
         return image_data;
     } 
 
     png_infop info = png_create_info_struct(png);
     if(!info) {
-        std::cout << "Failed to build PNG information struct" << std::endl;
         fclose(input_image);
         return image_data;
     }
 
     if(setjmp(png_jmpbuf(png))) {
-        std::cout << "Failed to offset pointer to image data" << std::endl;
         fclose(input_image);
          return image_data;
     }
@@ -90,11 +84,7 @@ sp_Image Png_loader::get_png_image_data(const char *file_name)
         delete[] row_pointers;
     }
 
-    std::cout << "Loaded pixel data" << std::endl;
-
     fclose(input_image);
-
-    std::cout << "Everything ok returning image...if still fails something is seriously fucked up!" << std::endl;
 
     return image_data;
 }
