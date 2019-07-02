@@ -34,13 +34,12 @@ error Compute_module::fast_cpu_edge_detection(int num_of_threads)
     vector<thread> threads(num_of_threads);
     size_t width = original_image->width;
     size_t stride = width * (num_of_threads-1);
-
+    int i = 0;
     for (size_t i = 0; i < num_of_threads; i++)
     {
         threads[i] = thread(cpu_edge_detection_workload,ref(original_image), ref(processed_image),
                    i*width, i*width + width, stride);
     }
-
 
 
     for (auto &t : threads)
@@ -74,7 +73,7 @@ void Compute_module::cpu_edge_detection_workload(sp_Image const &original_image,
             if (i == end_index - 1 && (start_index + stride) < size)
             {
             start_index = end_index + stride;
-            end_index += end_index + stride;
+            end_index = start_index + width;
             i = start_index;
             }
             continue;
@@ -84,7 +83,7 @@ void Compute_module::cpu_edge_detection_workload(sp_Image const &original_image,
             if (i == end_index-1 && (start_index + stride) < size)
             {
             start_index = end_index + stride;
-            end_index += end_index + stride;
+            end_index = start_index + width;
             i = start_index;
             }
             continue;
